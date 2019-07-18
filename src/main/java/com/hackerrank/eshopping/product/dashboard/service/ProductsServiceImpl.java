@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.xml.ws.http.HTTPException;
@@ -29,8 +31,8 @@ public class ProductsServiceImpl implements ProductsService {
     public ResponseEntity addProduct(Product product) {
 
         if (!productsRepository.existsById(product.getId())) {
-            productsRepository.save(product);
-            return ResponseEntity.status(HttpStatus.CREATED).body(null);
+            Product product1 = productsRepository.save(product);
+            return ResponseEntity.status(HttpStatus.CREATED).body(product1);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -39,12 +41,12 @@ public class ProductsServiceImpl implements ProductsService {
     @Override
     public ResponseEntity updateProduct(Product product, long productId) {
         try {
-            Product retrievedProduct = getProductById(productId);
+            Product retrievedProduct = productsRepository.findById(productId).orElseThrow(Error::new);
             retrievedProduct.setAvailability(product.getAvailability());
             retrievedProduct.setCategory(product.getCategory());
             retrievedProduct.setDiscountedPrice(product.getDiscountedPrice());
-            productsRepository.save(retrievedProduct);
-            return ResponseEntity.status(HttpStatus.OK).body(null);
+            Product product1 = productsRepository.save(retrievedProduct);
+            return ResponseEntity.status(HttpStatus.OK).body(product1);
         } catch (Error error) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }

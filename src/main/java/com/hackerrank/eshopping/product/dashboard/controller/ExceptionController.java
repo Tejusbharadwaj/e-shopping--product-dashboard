@@ -1,5 +1,6 @@
 package com.hackerrank.eshopping.product.dashboard.controller;
 
+import com.hackerrank.eshopping.product.dashboard.exception.ParameterViolationException;
 import com.hackerrank.eshopping.product.dashboard.exception.ResourceNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -45,6 +46,7 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
     }
 
 
+
     // 412
 
     // 500
@@ -56,6 +58,26 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
                 bodyOfResponse,
                 new HttpHeaders(),
                 HttpStatus.INTERNAL_SERVER_ERROR,
+                request);
+    }
+
+    @ExceptionHandler({ResourceNotFoundException.class})
+    public ResponseEntity<Object> handleInternal(final ResourceNotFoundException ex, final WebRequest request) {
+        final String bodyOfResponse = ex.toString();
+        return handleExceptionInternal(ex,
+                bodyOfResponse,
+                new HttpHeaders(),
+                HttpStatus.NOT_FOUND,
+                request);
+    }
+
+    @ExceptionHandler({ParameterViolationException.class})
+    public ResponseEntity<Object> handleInternal(final ParameterViolationException ex, final WebRequest request) {
+        final String bodyOfResponse = ex.toString();
+        return handleExceptionInternal(ex,
+                bodyOfResponse,
+                new HttpHeaders(),
+                HttpStatus.NOT_FOUND,
                 request);
     }
 }
